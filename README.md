@@ -1,4 +1,4 @@
-3 Static Site Deployment Practice
+S3 Static Site Deployment Practice
 
 This repository contains a simple static website and two ways of deploying it to AWS S3:
 
