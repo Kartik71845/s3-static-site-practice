@@ -1,4 +1,4 @@
-S3 Static Site Deployment Practice
+3 Static Site Deployment Practice
 
 This repository contains a simple static website and two ways of deploying it to AWS S3:
 
@@ -41,7 +41,6 @@ Set bucket policy for public access (replace your-bucket-name):
   }]
 }
 
-
 Access your site via the bucket’s website endpoint.
 
 🤖 Method 2: Automated Deployment (GitHub Actions)
@@ -65,6 +64,20 @@ S3_BUCKET_REGION (e.g., us-east-1)
 GitHub Action workflow (.github/workflows/deploy.yml):
 
 name: Deploy Static Site to S3
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+     name: Deploy Static Site to S3
 
 on:
   push:
