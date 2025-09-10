@@ -14,7 +14,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Upload files to S3
+      # Step 2: Debug bucket secret
+      - name: Debug bucket secret
+        run: |
+          if [ -z "${{ secrets.S3_BUCKET }}" ]; then
+            echo "❌ S3_BUCKET secret is empty!"
+          else
+            echo "✅ S3_BUCKET secret is set (hidden for security)"
+          fi
+
+      # Step 3: Upload files to S3
       - name: Upload files to S3
         run: |
           echo "Starting upload to S3..."
@@ -25,4 +34,4 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        
+          AWS_DEFAULT_REGION: ${{ secrets.S3_BUCKET_REGION }}
