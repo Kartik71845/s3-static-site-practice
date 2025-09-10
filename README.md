@@ -1,26 +1,35 @@
-# S3 Static Site Practice
+S3 Static Site Deployment Practice
 
-This repository contains a simple static website for practicing deployment to **AWS S3**.
+This repository contains a simple static website and two ways of deploying it to AWS S3:
 
-## Project Files
+Manual Upload (from AWS Console)
 
-- `index.html` – The main webpage
-- `style.css` – Styling for the webpage
-- `app.js` *(optional)* – JavaScript for interactivity
+Automated Deployment (with GitHub Actions)
 
-## How to Deploy Manually
+Project Files
 
-1. **Create an S3 bucket** in AWS.
-2. **Enable Static Website Hosting**:
-   - Go to the bucket properties → Static website hosting → Enable.
-   - Set the index document to `index.html`.
-3. **Upload your files**:
-   - Upload `index.html`, `style.css`, and `app.js` (if exists) to the bucket.
-4. **Set bucket permissions**:
-   - Go to the **Permissions** tab → Bucket Policy.
-   - Add a policy to make objects publicly readable, e.g.:
+index.html – Main webpage
 
-```json
+style.css – Styling for the webpage
+
+app.js (optional) – JavaScript interactivity
+
+🚀 Method 1: Manual Deployment (AWS Console)
+
+Create an S3 bucket in AWS.
+
+Enable Static Website Hosting
+
+Go to Properties → Static website hosting → Enable
+
+Set index document = index.html
+
+Upload files
+
+Upload index.html, style.css, and app.js (if exists).
+
+Set bucket policy for public access (replace your-bucket-name):
+
 {
   "Version":"2012-10-17",
   "Statement":[{
@@ -33,22 +42,53 @@ This repository contains a simple static website for practicing deployment to **
 }
 
 
-Access your website via the S3 bucket endpoint (provided in the Static Website Hosting section).
+Access your site via the bucket’s website endpoint.
 
-Optional: Deploy via GitHub Actions
+🤖 Method 2: Automated Deployment (GitHub Actions)
 
-You can automate deployment using GitHub Actions:
+This repo includes a GitHub Actions workflow that deploys the site to S3 on every push to the main branch.
 
-Store your AWS credentials (AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY) in GitHub Secrets.
+Setup
 
-Add a workflow file .github/workflows/deploy.yml with a job to sync the repo files to S3.
+Create an S3 bucket (same as above).
 
-Every push to main can automatically update your S3 website.
+Add these secrets in your GitHub repo:
 
-Notes
+AWS_ACCESS_KEY_ID
 
-This project is purely static (HTML, CSS, JS) with no backend.
+AWS_SECRET_ACCESS_KEY
 
-Ensure your S3 bucket allows public access if you want the website to be accessible.
+S3_BUCKET (your bucket name)
 
-Practice GitHub Actions to deploy changes automatically.
+S3_BUCKET_REGION (e.g., us-east-1)
+
+GitHub Action workflow (.github/workflows/deploy.yml):
+
+name: Deploy Static Site to S3
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Upload files to S3
+        run: |
+          echo "Starting upload to S3..."
+          aws s3 sync . s3://${{ secrets.S3_BUCKET }} \
+            --delete \
+            --exact-timestamps
+          echo "Upload finished!"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.S3_BUCKET_REGION }}
+
+
+Now, every time you push to main, GitHub will automatically sync your files with your S3 bucket.
